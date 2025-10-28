@@ -45,11 +45,11 @@ const Profile = ({ walletAddress }) => {
       // Get the balance in wei
       const balanceWei = await ethersProvider.getBalance(walletAddress);
 
-      // Convert from wei to STT
-      const balanceSTT = ethers.formatEther(balanceWei);
-      setBalance(balanceSTT);
+      // Convert from wei to FLOW
+      const balanceFLOW = ethers.formatEther(balanceWei);
+      setBalance(balanceFLOW);
 
-      console.log("Balance fetched:", balanceSTT, "STT");
+      console.log("Balance fetched:", balanceFLOW, "FLOW");
     } catch (error) {
       console.error("Error fetching balance:", error);
       toast.error("Failed to fetch balance");
@@ -176,7 +176,7 @@ const Profile = ({ walletAddress }) => {
         <p className="text-black font-bold text-lg" style={{
           fontFamily: "'Orbitron', monospace",
           textTransform: 'uppercase'
-        }}>MANAGE YOUR SOMNIA WALLET AND PROFILE SETTINGS</p>
+        }}>MANAGE YOUR FLOW WALLET AND PROFILE SETTINGS</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -258,7 +258,7 @@ const Profile = ({ walletAddress }) => {
                   textTransform: 'uppercase'
                 }}>► NETWORK</label>
                 <input
-                  value="SOMNIA TESTNET"
+                  value="FLOW TESTNET"
                   readOnly
                   className="w-full p-3 border-3 border-black text-sm bg-white font-bold"
                   style={{
@@ -321,7 +321,7 @@ const Profile = ({ walletAddress }) => {
               {loading ? (
                 <div className="animate-pulse">LOADING...</div>
               ) : (
-                `${parseFloat(balance).toFixed(4)} STT`
+                `${parseFloat(balance).toFixed(4)} FLOW`
               )}
             </div>
           </div>
@@ -337,7 +337,7 @@ const Profile = ({ walletAddress }) => {
                 textTransform: 'uppercase'
               }}
             >
-              💸 WITHDRAW STT
+              💸 WITHDRAW FLOW
             </button>
 
             <button
@@ -366,7 +366,7 @@ const Profile = ({ walletAddress }) => {
                 fontFamily: "'Orbitron', monospace",
                 textTransform: 'uppercase'
               }}>
-                💸 WITHDRAW STT TOKENS
+                💸 WITHDRAW FLOW TOKENS
               </h3>
             </div>
 
@@ -375,7 +375,7 @@ const Profile = ({ walletAddress }) => {
               <p className="text-black text-sm font-bold" style={{
                 fontFamily: "'Orbitron', monospace"
               }}>
-                Send your STT tokens to an external wallet address
+                Send your FLOW tokens to an external wallet address
               </p>
 
               {/* Amount Input */}
@@ -383,7 +383,7 @@ const Profile = ({ walletAddress }) => {
                 <label className="block mb-2 font-black text-black" style={{
                   fontFamily: "'Orbitron', monospace",
                   textTransform: 'uppercase'
-                }}>► AMOUNT (STT)</label>
+                }}>► AMOUNT (FLOW)</label>
                 <input
                   type="number"
                   value={withdrawAmount}
@@ -400,7 +400,7 @@ const Profile = ({ walletAddress }) => {
                 <div className="mt-2 text-black text-sm font-bold" style={{
                   fontFamily: "'Orbitron', monospace"
                 }}>
-                  Available: {parseFloat(balance).toFixed(4)} STT
+                  Available: {parseFloat(balance).toFixed(4)} FLOW
                 </div>
               </div>
 

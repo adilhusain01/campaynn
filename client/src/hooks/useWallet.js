@@ -25,7 +25,7 @@ export function useWallet() {
 
       if (activeWallet) {
         try {
-          await activeWallet.switchChain(0xc488) // Somnia Testnet (50312 in hex)
+          await activeWallet.switchChain(0x221) // Flow Testnet
         } catch (chainError) {
           console.warn('Chain switch failed, continuing with current chain:', chainError)
         }
@@ -71,7 +71,7 @@ export function useWallet() {
         try {
           if (activeWallet) {
             try {
-              await activeWallet.switchChain(0xc488) // Somnia Testnet
+              await activeWallet.switchChain(0x221) // Flow Testnet
             } catch (chainError) {
               console.warn('Chain switch failed, continuing with current chain:', chainError)
             }

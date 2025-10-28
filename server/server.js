@@ -142,7 +142,7 @@ const youtubeAPI = new YouTubeAPIManager();
 import { CAMPAIGN_MANAGER_ADDRESS, CAMPAIGN_MANAGER_ABI } from './utils/contract.js';
 
 console.log('⛓️ Initializing blockchain connection...');
-const provider = new ethers.JsonRpcProvider('https://dream-rpc.somnia.network');
+const provider = new ethers.JsonRpcProvider('https://testnet.evm.nodes.onflow.org');
 console.log('🔐 Creating wallet instance...');
 const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 console.log(`💼 Wallet address: ${wallet.address}`);
@@ -1131,10 +1131,10 @@ cron.schedule('0 * * * *', async () => {
 
               console.log(`🎉 Campaign ${campaignId} completed with ${winners.length} winner(s):`);
               for (let i = 0; i < winners.length; i++) {
-                console.log(`   ${i + 1}${i === 0 ? 'st' : i === 1 ? 'nd' : 'rd'} place: ${winners[i]} - ${ethers.formatEther(actualRewards[i])} STT (${rewardPercentages[i]}%)`);
+                console.log(`   ${i + 1}${i === 0 ? 'st' : i === 1 ? 'nd' : 'rd'} place: ${winners[i]} - ${ethers.formatEther(actualRewards[i])} FLOW (${rewardPercentages[i]}%)`);
               }
               if (refundAmount > 0) {
-                console.log(`💰 Refund to creator: ${ethers.formatEther(refundAmount)} STT`);
+                console.log(`💰 Refund to creator: ${ethers.formatEther(refundAmount)} FLOW`);
               }
             } catch (error) {
               console.error(`❌ Error completing campaign ${campaignId}:`, error);
@@ -1152,7 +1152,7 @@ cron.schedule('0 * * * *', async () => {
                 await tx.wait();
 
                 const totalReward = campaignInfo[1]; // Total reward in wei
-                console.log(`💰 Emergency withdraw completed for campaign ${campaignId} - full refund of ${ethers.formatEther(totalReward)} STT returned to creator`);
+                console.log(`💰 Emergency withdraw completed for campaign ${campaignId} - full refund of ${ethers.formatEther(totalReward)} FLOW returned to creator`);
               } catch (error) {
                 console.error(`❌ Error performing emergency withdraw for campaign ${campaignId}:`, error);
               }
