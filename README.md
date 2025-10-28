@@ -127,6 +127,6 @@ The best brands are already making the switch. Every day you wait, your competit
 
 ### Start Today
 
-**Contract:** `0x91C0979942149feD82672d2CeA65311073547178`
+**Contract:** `0xC794d0CA42C99eAcBDDd736102DCF6B6ca7C83cF`
 
 Launch your first campaign at [https://campayn-one.vercel.app](https://campayn-one.vercel.app)
