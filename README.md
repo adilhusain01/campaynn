@@ -3,7 +3,7 @@
 
 ## Where Real People Drive Real Results
 
-[https://campayn-one.vercel.app](https://campayn-one.vercel.app)
+https://campaynn.vercel.app
 
 **Nobody watches ads anymore. Everyone watches creators.** We connect brands with influencers who actually reach people. Through:
 
@@ -129,4 +129,4 @@ The best brands are already making the switch. Every day you wait, your competit
 
 **Contract:** `0xC794d0CA42C99eAcBDDd736102DCF6B6ca7C83cF`
 
-Launch your first campaign at [https://campayn-one.vercel.app](https://campayn-one.vercel.app)
+Launch your first campaign at https://campaynn.vercel.app
