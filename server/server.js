@@ -805,14 +805,23 @@ app.post('/api/submissions', async (req, res) => {
     });
 
     if (existingSubmission) {
-      return res.status(400).json({
-        error: 'You have already submitted a video for this campaign. Only one submission per campaign is allowed.',
-        existingSubmission: {
-          youtubeUrl: existingSubmission.youtubeUrl,
-          submittedAt: existingSubmission.createdAt,
-          performanceScore: existingSubmission.performanceScore
-        }
-      });
+      // Allow resubmission if AI verification failed with an error
+      const canResubmit = existingSubmission.aiVerification?.status === 'error' ||
+                         existingSubmission.aiVerification?.status === 'rejected';
+
+      if (!canResubmit) {
+        return res.status(400).json({
+          error: 'You have already submitted a video for this campaign. Only one submission per campaign is allowed.',
+          existingSubmission: {
+            youtubeUrl: existingSubmission.youtubeUrl,
+            submittedAt: existingSubmission.createdAt,
+            performanceScore: existingSubmission.performanceScore
+          }
+        });
+      }
+
+      // If resubmission is allowed, we'll update the existing submission instead of creating a new one
+      console.log(`🔄 Allowing resubmission for campaign ${campaignId} - previous AI verification status: ${existingSubmission.aiVerification?.status}`);
     }
 
     let videoStats = {
@@ -851,21 +860,61 @@ app.post('/api/submissions', async (req, res) => {
       durationSeconds
     );
 
-    const submission = new Submission({
-      campaignId,
-      influencerId: influencer._id,
-      youtubeVideoId: videoId,
-      youtubeUrl,
-      viewCount: videoStats.viewCount,
-      likeCount: videoStats.likeCount,
-      commentCount: videoStats.commentCount,
-      performanceScore,
-      aiVerification: {
-        status: 'pending'
-      }
-    });
+    let savedSubmission;
 
-    const savedSubmission = await submission.save();
+    if (existingSubmission) {
+      // Update existing submission with new video data
+      savedSubmission = await Submission.findByIdAndUpdate(
+        existingSubmission._id,
+        {
+          youtubeVideoId: videoId,
+          youtubeUrl,
+          viewCount: videoStats.viewCount,
+          likeCount: videoStats.likeCount,
+          commentCount: videoStats.commentCount,
+          performanceScore,
+          lastAnalyticsUpdate: new Date(),
+          aiVerification: {
+            status: 'pending',
+            approved: false,
+            confidence: null,
+            reason: null,
+            brandMentions: [],
+            promotionalSegmentWordCount: 0,
+            meetsRequirements: {
+              mentionsBrand: false,
+              followsGuidelines: false,
+              adequateWordCount: false
+            },
+            transcriptLanguage: null,
+            transcriptLength: null,
+            processingTime: null,
+            verifiedAt: null,
+            error: null
+          }
+        },
+        { new: true }
+      );
+      console.log(`🔄 Updated existing submission ${savedSubmission._id} with new video ${videoId}`);
+    } else {
+      // Create new submission
+      const submission = new Submission({
+        campaignId,
+        influencerId: influencer._id,
+        youtubeVideoId: videoId,
+        youtubeUrl,
+        viewCount: videoStats.viewCount,
+        likeCount: videoStats.likeCount,
+        commentCount: videoStats.commentCount,
+        performanceScore,
+        aiVerification: {
+          status: 'pending'
+        }
+      });
+
+      savedSubmission = await submission.save();
+      console.log(`✅ Created new submission ${savedSubmission._id} for video ${videoId}`);
+    }
 
     // Perform AI content verification asynchronously
     performAIVerification(savedSubmission._id, videoId, campaign);

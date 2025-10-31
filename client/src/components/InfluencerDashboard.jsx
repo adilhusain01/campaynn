@@ -231,16 +231,26 @@ const InfluencerDashboard = ({ walletAddress }) => {
         youtubeUrl: submissionForm.youtubeUrl
       });
 
-      alert('Video submitted successfully!');
+      const isResubmission = submissions.some(sub => sub.campaignId == submissionForm.campaignId);
+      alert(isResubmission ? 'Video resubmitted successfully! AI verification will begin shortly.' : 'Video submitted successfully!');
       setSubmissionForm({ campaignId: '', youtubeUrl: '' });
 
-      const newSubmission = {
+      const submissionData = {
         ...response.data,
         campaign_title: registeredCampaigns.find(c => c.id == submissionForm.campaignId)?.title || `Campaign #${submissionForm.campaignId}`
       };
 
-      console.log('New submission data:', newSubmission); // Debug log
-      setSubmissions(prev => [newSubmission, ...prev]);
+      console.log('Submission data:', submissionData);
+
+      if (isResubmission) {
+        // Update existing submission in the list
+        setSubmissions(prev => prev.map(sub =>
+          sub.campaignId == submissionForm.campaignId ? submissionData : sub
+        ));
+      } else {
+        // Add new submission to the list
+        setSubmissions(prev => [submissionData, ...prev]);
+      }
 
       // Reload dashboard data to ensure we have the latest information
       setTimeout(() => {
@@ -538,15 +548,23 @@ const InfluencerDashboard = ({ walletAddress }) => {
                 >
                   <option value="">CHOOSE A CAMPAIGN...</option>
                   {registeredCampaigns.map((campaign) => {
-                    const hasSubmitted = submissions.some(sub => sub.campaignId == campaign.id);
+                    const submission = submissions.find(sub => sub.campaignId == campaign.id);
+                    const hasSubmitted = !!submission;
+                    const canResubmit = submission && (
+                      submission.aiVerification?.status === 'error' ||
+                      submission.aiVerification?.status === 'rejected'
+                    );
+                    const isDisabled = hasSubmitted && !canResubmit;
+
                     return (
                       <option
                         key={campaign.id}
                         value={campaign.id}
-                        disabled={hasSubmitted}
-                        style={hasSubmitted ? { backgroundColor: '#f0f0f0', color: '#666' } : {}}
+                        disabled={isDisabled}
+                        style={isDisabled ? { backgroundColor: '#f0f0f0', color: '#666' } : {}}
                       >
-                        {hasSubmitted ? '✓ SUBMITTED: ' : ''}{(campaign.title || `CAMPAIGN #${campaign.id}`).toUpperCase()} - {campaign.totalReward} FLOW
+                        {hasSubmitted && !canResubmit ? '✓ SUBMITTED: ' :
+                         canResubmit ? '🔄 RESUBMIT: ' : ''}{(campaign.title || `CAMPAIGN #${campaign.id}`).toUpperCase()} - {campaign.totalReward} FLOW
                       </option>
                     );
                   })}
@@ -555,7 +573,7 @@ const InfluencerDashboard = ({ walletAddress }) => {
                   <div className="mt-2 text-black text-sm font-bold" style={{
                     fontFamily: "'Orbitron', monospace"
                   }}>
-                    ℹ️ Campaigns marked "✓ SUBMITTED" are disabled - only one submission per campaign allowed.
+                    ℹ️ "✓ SUBMITTED" campaigns are disabled. "🔄 RESUBMIT" campaigns allow new video submission after AI verification failure.
                   </div>
                 )}
               </div>
@@ -633,12 +651,12 @@ const InfluencerDashboard = ({ walletAddress }) => {
                       <div className="w-5 h-5 border-2 border-current border-t-transparent animate-spin mr-2" style={{
                         borderRadius: 0
                       }}></div>
-                      SUBMITTING...
+                      {submissions.some(sub => sub.campaignId == submissionForm.campaignId) ? 'RESUBMITTING...' : 'SUBMITTING...'}
                     </span>
                   ) : (
                     <span className="flex items-center">
                       <span className="mr-2">►</span>
-                      SUBMIT VIDEO
+                      {submissions.some(sub => sub.campaignId == submissionForm.campaignId) ? 'RESUBMIT VIDEO' : 'SUBMIT VIDEO'}
                     </span>
                   )}
                 </button>
@@ -802,6 +820,9 @@ const InfluencerDashboard = ({ walletAddress }) => {
                         fontFamily: "'Orbitron', monospace"
                       }}>
                         🔍 CLICK FOR DETAILS
+                        {(submission.aiVerification.status === 'error' || submission.aiVerification.status === 'rejected') && (
+                          <span className="block text-purple-600 mt-1">📹 CAN RESUBMIT NEW VIDEO</span>
+                        )}
                       </div>
                     </div>
                   )}
@@ -956,7 +977,7 @@ const InfluencerDashboard = ({ walletAddress }) => {
 
                 {/* Actions */}
                 {(aiDetails.aiVerification?.status === 'error' || aiDetails.aiVerification?.status === 'rejected') && (
-                  <div className="flex gap-4">
+                  <div className="flex gap-4 flex-wrap">
                     <button
                       onClick={() => {
                         retryAIVerification(showAIDetails);
@@ -969,6 +990,28 @@ const InfluencerDashboard = ({ walletAddress }) => {
                       }}
                     >
                       🔄 RETRY VERIFICATION
+                    </button>
+                    <button
+                      onClick={() => {
+                        // Find the campaign for this submission
+                        const submission = submissions.find(sub => sub.id === showAIDetails);
+                        if (submission) {
+                          setSubmissionForm({
+                            campaignId: submission.campaignId,
+                            youtubeUrl: ''
+                          });
+                          // Scroll to submission form
+                          document.querySelector('#campaignSelect')?.scrollIntoView({ behavior: 'smooth' });
+                        }
+                        setShowAIDetails(null);
+                      }}
+                      className="pixel-button px-4 py-2 font-black bg-blue-600 hover:bg-blue-700"
+                      style={{
+                        fontFamily: "'Orbitron', monospace",
+                        textTransform: 'uppercase'
+                      }}
+                    >
+                      📹 SUBMIT NEW VIDEO
                     </button>
                   </div>
                 )}
