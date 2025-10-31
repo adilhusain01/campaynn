@@ -1024,11 +1024,7 @@ app.post('/api/submissions/:id/verify', async (req, res) => {
   try {
     const { id } = req.params;
 
-    const submission = await Submission.findById(id)
-      .populate({
-        path: 'campaignId',
-        model: 'Campaign'
-      });
+    const submission = await Submission.findById(id);
 
     if (!submission) {
       return res.status(404).json({ error: 'Submission not found' });
