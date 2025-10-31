@@ -46,7 +46,7 @@ export const flowTestnet = {
   },
   rpcUrls: {
     default: {
-      http: ['https://flow-testnet.gateway.tatum.io'],
+      http: ['https://testnet.evm.nodes.onflow.org'],
     },
   },
   blockExplorers: {
