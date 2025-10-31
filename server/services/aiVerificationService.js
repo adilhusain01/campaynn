@@ -23,7 +23,7 @@ class AIVerificationService {
       console.log(`🔑 GEMINI_API_KEY at lazy init: ${!!process.env.GEMINI_API_KEY}`);
       console.log(`🔑 GEMINI_API_KEY value: ${process.env.GEMINI_API_KEY}`);
       this._genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-      this._model = this._genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+      this._model = this._genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
       console.log(`✅ Gemini AI client initialized`);
     }
     return this._model;
